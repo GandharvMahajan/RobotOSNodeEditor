@@ -4,6 +4,7 @@ from PySide6.QtGui import QPainterPath, QPen, QColor, QTransform, QBrush
 
 from packages.base.node import BaseNode, Port
 from connection import Connection
+from node_menu import NodeSearchMenu
 
 # Import specific node types from their respective packages
 from packages.teleoperation import KeyboardTeleopNode, JoystickTeleopNode
@@ -133,23 +134,21 @@ class NodeScene(QGraphicsScene):
 
     def showContextMenu(self, position):
         """Show a context menu at the given scene position"""
-        # Create menu
-        menu = QMenu()
+        # Create custom menu with search
+        menu = NodeSearchMenu()
         
-        # Teleoperation submenu
-        teleop_menu = menu.addMenu("Teleoperation")
-        keyboard_action = teleop_menu.addAction("Keyboard Teleop")
-        joy_action = teleop_menu.addAction("Joystick Teleop")
+        # Add node categories and actions
+        # Teleoperation nodes
+        menu.add_node_action("Teleoperation", "Keyboard Teleop", KeyboardTeleopNode)
+        menu.add_node_action("Teleoperation", "Joystick Teleop", JoystickTeleopNode)
         
-        # Navigation submenu
-        nav_menu = menu.addMenu("Navigation & Mapping")
-        nav2_action = nav_menu.addAction("Nav2")
-        slam_action = nav_menu.addAction("SLAM Toolbox")
+        # Navigation nodes
+        menu.add_node_action("Navigation & Mapping", "Nav2", Nav2Node)
+        menu.add_node_action("Navigation & Mapping", "SLAM Toolbox", SlamToolboxNode)
         
-        # Control submenu
-        control_menu = menu.addMenu("Robot Control")
-        ros2_control_action = control_menu.addAction("ROS2 Controllers")
-        twist_mux_action = control_menu.addAction("Twist Mux")
+        # Control nodes
+        menu.add_node_action("Robot Control", "ROS2 Controllers", ROS2ControllersNode)
+        menu.add_node_action("Robot Control", "Twist Mux", TwistMuxNode)
         
         # Get the first view
         if not self.views():
@@ -163,34 +162,12 @@ class NodeScene(QGraphicsScene):
         # Execute menu at the correct position
         action = menu.exec_(global_pos)
         
-        # Process result
-        if action == keyboard_action:
-            print("Creating Keyboard Teleop node")
-            node = KeyboardTeleopNode()
-            node.setPos(position)
-            self.addItem(node)
-        elif action == joy_action:
-            print("Creating Joystick Teleop node")
-            node = JoystickTeleopNode()
-            node.setPos(position)
-            self.addItem(node)
-        elif action == nav2_action:
-            print("Creating Nav2 node")
-            node = Nav2Node()
-            node.setPos(position)
-            self.addItem(node)
-        elif action == slam_action:
-            print("Creating SLAM Toolbox node")
-            node = SlamToolboxNode()
-            node.setPos(position)
-            self.addItem(node)
-        elif action == ros2_control_action:
-            print("Creating ROS2 Controllers node")
-            node = ROS2ControllersNode()
-            node.setPos(position)
-            self.addItem(node)
-        elif action == twist_mux_action:
-            print("Creating Twist Mux node")
-            node = TwistMuxNode()
-            node.setPos(position)
-            self.addItem(node)
+        # Process result - find which node was selected
+        if action:
+            for node_name, node_info in menu.all_node_actions.items():
+                if node_info['action'] == action:
+                    print(f"Creating {node_name} node")
+                    node = node_info['node_class']()
+                    node.setPos(position)
+                    self.addItem(node)
+                    break
