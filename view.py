@@ -97,7 +97,7 @@ class NodeView(QGraphicsView):
         current_scale = self.transform().m11()
         
         # Calculate zoom factor based on wheel delta
-        zoom_factor = 1.2
+        zoom_factor = 1.01  # Reduced from 1.2 to 1.05 (5% change instead of 20%)
         
         # Determine zoom direction
         if event.angleDelta().y() > 0:
