@@ -5,9 +5,7 @@ from view import NodeView
 
 # Import node classes from their respective packages
 from packages.base import BaseNode
-from packages.teleoperation import TeleoperationNode
-from packages.navigation import NavigationNode
-from packages.robot_control import RobotControlNode
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
