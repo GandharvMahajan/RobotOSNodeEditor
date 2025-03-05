@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Test runner for the PysideNodeApp application
 import unittest
 import sys
 from PySide6.QtWidgets import QApplication
