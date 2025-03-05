@@ -31,4 +31,22 @@ class RobotControlNode(BaseNode):
             self.add_output_port("cmd_vel")
         
         # Update the node's appearance
-        self.update() 
+        self.update()
+        
+    def on_start(self):
+        """Called when the node is started"""
+        print(f"Starting robot control node: {self.title} ({self.control_type})")
+        # In a real implementation, this would:
+        # 1. Initialize the control interfaces
+        # 2. Connect to hardware drivers
+        # 3. Start the control loops
+        # 4. Set up safety monitors
+        
+    def on_stop(self):
+        """Called when the node is stopped"""
+        print(f"Stopping robot control node: {self.title} ({self.control_type})")
+        # In a real implementation, this would:
+        # 1. Stop the control loops
+        # 2. Send zero commands to actuators
+        # 3. Disconnect from hardware drivers
+        # 4. Ensure the robot is in a safe state 

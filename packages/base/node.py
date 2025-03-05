@@ -64,6 +64,8 @@ class BaseNode(QGraphicsItem):
         self.text_color = QColor(220, 220, 220)   # Light gray for text
         self.port_color = QColor(180, 180, 180)   # Light gray for ports
         self.border_color = QColor(100, 100, 100) # Medium gray for borders
+        self.run_button_color = QColor(50, 180, 50)  # Green for run
+        self.stop_button_color = QColor(180, 50, 50)  # Red for stop
         
         # Port management
         self.input_ports = {}
@@ -73,6 +75,11 @@ class BaseNode(QGraphicsItem):
         self.port_under_mouse = None
         self._dragging = False
         self._drag_start_pos = QPointF()
+        
+        # Run/Stop button properties
+        self.is_running = False
+        self.button_size = 20
+        self.button_margin = 10
         
         # Accept hover events
         self.setAcceptHoverEvents(True)
@@ -109,8 +116,48 @@ class BaseNode(QGraphicsItem):
                      self.width + 2*padding, 
                      self.height + 2*padding)
 
+    def toggle_run_state(self):
+        """Toggle the run/stop state of the node"""
+        self.is_running = not self.is_running
+        self.update()  # Trigger repaint
+        
+        # Implement any additional logic when the state changes
+        if self.is_running:
+            self.on_start()
+        else:
+            self.on_stop()
+    
+    def on_start(self):
+        """Called when the node is started"""
+        # Override in subclasses to implement specific start behavior
+        pass
+    
+    def on_stop(self):
+        """Called when the node is stopped"""
+        # Override in subclasses to implement specific stop behavior
+        pass
+    
+    def get_button_rect(self):
+        """Get the rectangle for the run/stop button"""
+        return QRectF(
+            self.width - self.button_size - self.button_margin,
+            self.height - self.button_size - self.button_margin,
+            self.button_size,
+            self.button_size
+        )
+    
+    def is_point_in_button(self, point):
+        """Check if the given point is within the run/stop button"""
+        return self.get_button_rect().contains(point)
+
     def mousePressEvent(self, event):
         """Handle mouse press events on the node"""
+        # Check if we clicked on the run/stop button
+        if self.is_point_in_button(event.pos()):
+            self.toggle_run_state()
+            event.accept()
+            return
+            
         # Store the original position for potential dragging
         self._drag_start_pos = event.pos()
         
@@ -293,4 +340,21 @@ class BaseNode(QGraphicsItem):
             painter.setPen(QPen(self.text_color))
             painter.setFont(QFont("Arial", 8))
             text_width = painter.fontMetrics().horizontalAdvance(port.name)
-            painter.drawText(port.relative_pos.x() - text_width - 10, port.relative_pos.y() + 4, port.name) 
+            painter.drawText(port.relative_pos.x() - text_width - 10, port.relative_pos.y() + 4, port.name)
+            
+        # Draw run/stop button
+        button_rect = self.get_button_rect()
+        button_color = self.run_button_color if self.is_running else self.stop_button_color
+        painter.setBrush(QBrush(button_color))
+        painter.setPen(QPen(self.border_color, 1))
+        painter.drawRoundedRect(button_rect, 3, 3)
+        
+        # Draw button text
+        painter.setPen(QPen(self.text_color))
+        painter.setFont(QFont("Arial", 8, QFont.Bold))
+        button_text = "RUN" if not self.is_running else "STOP"
+        text_width = painter.fontMetrics().horizontalAdvance(button_text)
+        text_height = painter.fontMetrics().height()
+        text_x = button_rect.x() + (button_rect.width() - text_width) / 2
+        text_y = button_rect.y() + (button_rect.height() + text_height) / 2 - 2
+        painter.drawText(text_x, text_y, button_text) 

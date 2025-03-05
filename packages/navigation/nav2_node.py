@@ -22,4 +22,22 @@ class Nav2Node(BaseNode):
         self.add_output_port("path")
         
         # Update the node's appearance
-        self.update() 
+        self.update()
+        
+    def on_start(self):
+        """Called when the node is started"""
+        print(f"Starting navigation node: {self.title}")
+        # In a real implementation, this would:
+        # 1. Initialize the navigation stack
+        # 2. Start subscribing to sensor topics
+        # 3. Set up the navigation parameters
+        # 4. Begin processing navigation requests
+        
+    def on_stop(self):
+        """Called when the node is stopped"""
+        print(f"Stopping navigation node: {self.title}")
+        # In a real implementation, this would:
+        # 1. Stop the navigation stack
+        # 2. Unsubscribe from sensor topics
+        # 3. Send zero velocity commands to stop the robot
+        # 4. Clean up any resources 
