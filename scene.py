@@ -137,18 +137,21 @@ class NodeScene(QGraphicsScene):
         # Create custom menu with search
         menu = NodeSearchMenu()
         
-        # Add node categories and actions
+        # Add function category with utility actions
+        menu.add_node_action("Functions", "Add node button", None)
+        
+        # Add package categories and actions
         # Teleoperation nodes
-        menu.add_node_action("Teleoperation", "Keyboard Teleop", KeyboardTeleopNode)
-        menu.add_node_action("Teleoperation", "Joystick Teleop", JoystickTeleopNode)
+        menu.add_node_action("Packages/Teleoperation", "Keyboard Teleop", KeyboardTeleopNode, submenu=True)
+        menu.add_node_action("Packages/Teleoperation", "Joystick Teleop", JoystickTeleopNode, submenu=True)
         
         # Navigation nodes
-        menu.add_node_action("Navigation & Mapping", "Nav2", Nav2Node)
-        menu.add_node_action("Navigation & Mapping", "SLAM Toolbox", SlamToolboxNode)
+        menu.add_node_action("Packages/Navigation & Mapping", "Nav2", Nav2Node, submenu=True)
+        menu.add_node_action("Packages/Navigation & Mapping", "SLAM Toolbox", SlamToolboxNode, submenu=True)
         
         # Control nodes
-        menu.add_node_action("Robot Control", "ROS2 Controllers", ROS2ControllersNode)
-        menu.add_node_action("Robot Control", "Twist Mux", TwistMuxNode)
+        menu.add_node_action("Packages/Robot Control", "ROS2 Controllers", ROS2ControllersNode, submenu=True)
+        menu.add_node_action("Packages/Robot Control", "Twist Mux", TwistMuxNode, submenu=True)
         
         # Get the first view
         if not self.views():
@@ -166,8 +169,13 @@ class NodeScene(QGraphicsScene):
         if action:
             for node_name, node_info in menu.all_node_actions.items():
                 if node_info['action'] == action:
-                    print(f"Creating {node_name} node")
-                    node = node_info['node_class']()
-                    node.setPos(position)
-                    self.addItem(node)
+                    if node_name == "Add node button":
+                        # Handle the Add node button action
+                        print("Add node button clicked")
+                        # TODO: Implement functionality for adding a node button
+                    else:
+                        print(f"Creating {node_name} node")
+                        node = node_info['node_class']()
+                        node.setPos(position)
+                        self.addItem(node)
                     break
